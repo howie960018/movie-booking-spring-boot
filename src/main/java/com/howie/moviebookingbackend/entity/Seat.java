@@ -1,5 +1,6 @@
 package com.howie.moviebookingbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -19,6 +20,7 @@ public class Seat {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screening_id", nullable = false)
+    @JsonBackReference
     private Screening screening;
 
     // Constructors, getters, and setters
