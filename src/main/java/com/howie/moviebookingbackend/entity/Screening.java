@@ -3,6 +3,8 @@ package com.howie.moviebookingbackend.entity;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
@@ -20,10 +22,13 @@ public class Screening {
     @Column(name = "screening_time", nullable = false)
     private LocalDateTime screeningTime;
 
-    @Column(name = "available_seats", nullable = false)
-    private Integer availableSeats;
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    private List<Seat> seats = new ArrayList<>();
 
-    // Getters and setters
+
+    @Column(name = "available_seats", nullable = false)
+    private int availableSeats = 100;  // 添加 availableSeats 字段
+
 
     public Long getId() {
         return id;
@@ -49,11 +54,29 @@ public class Screening {
         this.screeningTime = screeningTime;
     }
 
-    public Integer getAvailableSeats() {
+    public List<Seat> getSeats() {
+        return seats;
+    }
+
+    public void setSeats(List<Seat> seats) {
+        this.seats = seats;
+    }
+
+    public void addSeat(Seat seat) {
+        seats.add(seat);
+        seat.setScreening(this);
+    }
+
+    public void removeSeat(Seat seat) {
+        seats.remove(seat);
+        seat.setScreening(null);
+    }
+
+    public int getAvailableSeats() {  // 添加 getter 方法
         return availableSeats;
     }
 
-    public void setAvailableSeats(Integer availableSeats) {
+    public void setAvailableSeats(int availableSeats) {  // 添加 setter 方法
         this.availableSeats = availableSeats;
     }
 }
