@@ -37,6 +37,13 @@ public class User {
     // Constructors
     public User() {
     }
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
+
+    public enum UserRole {
+        USER, ADMIN
+    }
+
 
     public User(String email, String password, String firstName, String lastName, String phoneNumber) {
         this.email = email;
@@ -45,9 +52,22 @@ public class User {
         this.lastName = lastName;
         this.phoneNumber = phoneNumber;
         this.createdAt = LocalDateTime.now();
+        this.role = UserRole.USER;
     }
 
     // Getters and setters
+    public UserRole getRole() {
+        return role;
+    }
+
+    public void setRole(UserRole role) {
+        this.role = role;
+    }
+
+    // 其他可能需要的方法
+    public boolean isAdmin() {
+        return this.role == UserRole.ADMIN;
+    }
     public Long getId() {
         return id;
     }
