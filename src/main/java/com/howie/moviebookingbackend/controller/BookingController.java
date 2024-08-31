@@ -3,9 +3,12 @@ package com.howie.moviebookingbackend.controller;
 import com.howie.moviebookingbackend.entity.Booking;
 import com.howie.moviebookingbackend.service.BookingService;
 import com.howie.moviebookingbackend.dto.BookingRequestDTO;
+import com.howie.moviebookingbackend.dto.BookingResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,16 +40,18 @@ public class BookingController {
         }
     }
 
+
     @PostMapping
     public ResponseEntity<?> createBooking(@RequestBody BookingRequestDTO bookingRequest) {
         try {
-            Booking createdBooking = bookingService.createBooking(bookingRequest);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            String userEmail = authentication.getName();
+            BookingResponseDTO createdBooking = bookingService.createBooking(userEmail, bookingRequest);
             return ResponseEntity.status(HttpStatus.CREATED).body(createdBooking);
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> cancelBooking(@PathVariable Long id) {
         try {
