@@ -23,5 +23,7 @@ public class Seat {
     @JsonBackReference
     private Screening screening;
 
-    // Constructors, getters, and setters
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "booking_id", nullable = true)
+    private Booking booking;
 }

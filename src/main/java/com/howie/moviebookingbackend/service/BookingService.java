@@ -10,6 +10,9 @@ public interface BookingService {
     Booking getBookingById(Long id);
     List<Booking> getBookingsByUserId(Long userId);
     List<Booking> getBookingsByScreeningId(Long screeningId);
-    BookingResponseDTO createBooking(String email, BookingRequestDTO bookingRequest);
+
+    BookingResponseDTO createBooking(BookingRequestDTO bookingRequestDTO);
     void cancelBooking(Long id);
+
+
 }

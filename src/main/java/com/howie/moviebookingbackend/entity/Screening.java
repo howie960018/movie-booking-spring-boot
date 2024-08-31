@@ -28,6 +28,7 @@ public class Screening {
     private List<Seat> seats = new ArrayList<>();
 
 
+
     @Column(name = "available_seats", nullable = false)
     private int availableSeats = 100;  // 添加 availableSeats 字段
 

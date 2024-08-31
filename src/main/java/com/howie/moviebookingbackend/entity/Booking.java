@@ -20,6 +20,8 @@ public class Booking {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL)
+    private List<Seat> seats;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screening_id", nullable = false)
@@ -39,9 +41,7 @@ public class Booking {
         CONFIRMED, CANCELLED, PENDING
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "seat_id", nullable = false)
-    private Seat seat;
+
 
 
     // Lombok will generate getters, setters, toString, equals, and hashCode methods
