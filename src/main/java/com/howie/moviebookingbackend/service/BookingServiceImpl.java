@@ -92,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setUser(user);
         booking.setScreening(screening);
         booking.setBookingTime(LocalDateTime.now());
-        booking.setStatus(Booking.BookingStatus.CONFIRMED);
+        booking.setStatus(Booking.BookingStatus.PENDING);
 
         // 先保存 Booking 以獲得 ID
         booking = bookingRepository.save(booking);

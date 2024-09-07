@@ -1,6 +1,6 @@
 package com.howie.moviebookingbackend.controller;
 
-import com.howie.moviebookingbackend.entity.Movie;
+
 import com.howie.moviebookingbackend.entity.Screening;
 import com.howie.moviebookingbackend.entity.Seat;
 import com.howie.moviebookingbackend.service.ScreeningService;
@@ -13,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -28,11 +27,11 @@ public class ScreeningController {
         this.screeningService = screeningService;
     }
 
-    @Autowired
-    private MovieRepository movieRepository;
-
-    @Autowired
-    private SeatRepository seatRepository;
+//    @Autowired
+//    private MovieRepository movieRepository;
+//
+//    @Autowired
+//    private SeatRepository seatRepository;
 
 
     @GetMapping
@@ -67,32 +66,9 @@ public class ScreeningController {
         try {
             Long movieId = Long.valueOf(payload.get("movieId").toString());
             LocalDateTime screeningTime = LocalDateTime.parse(payload.get("screeningTime").toString());
+            int numberOfSeats = 100; // 您可以從 payload 中獲取這個值，或者使用固定值
 
-            Movie movie = movieRepository.findById(movieId)
-                    .orElseThrow(() -> new RuntimeException("Movie not found"));
-
-            Screening screening = new Screening();
-            screening.setMovie(movie);
-            screening.setScreeningTime(screeningTime);
-            screening.setAvailableSeats(100); // 設定初始可用座位數量
-
-            // 保存Screening並獲取保存後的實體
-            Screening createdScreening = screeningService.saveScreening(screening);
-
-            // 生成100個座位
-            List<Seat> seats = new ArrayList<>();
-            for (int i = 1; i <= 100; i++) {
-                Seat seat = new Seat();
-                String seatNumber = "A" + i; // 生成座位號碼，如A1, A2, A3...
-                seat.setSeatNumber(seatNumber);
-                seat.setBooked(false); // 初始狀態設置為尚未預訂
-                seat.setScreening(createdScreening); // 與當前放映關聯
-
-                seats.add(seat);
-            }
-
-            // 保存所有座位到資料庫
-            seatRepository.saveAll(seats);
+            Screening createdScreening = screeningService.createScreeningWithSeats(movieId, screeningTime, numberOfSeats);
 
             return ResponseEntity.status(HttpStatus.CREATED).body(createdScreening);
         } catch (Exception e) {
@@ -100,50 +76,6 @@ public class ScreeningController {
                     .body("Error creating screening: " + e.getMessage());
         }
     }
-
-
-//    @PostMapping
-//    public ResponseEntity<?> createScreening(@RequestBody Map<String, Object> payload) {
-//        try {
-//            Long movieId = Long.valueOf(payload.get("movieId").toString());
-//            LocalDateTime screeningTime = LocalDateTime.parse(payload.get("screeningTime").toString());
-//
-//            Movie movie = movieRepository.findById(movieId)
-//                    .orElseThrow(() -> new RuntimeException("Movie not found"));
-//
-//            Screening screening = new Screening();
-//            screening.setMovie(movie);
-//            screening.setScreeningTime(screeningTime);
-//
-//            Screening createdScreening = screeningService.saveScreening(screening);
-//            return ResponseEntity.status(HttpStatus.CREATED).body(createdScreening);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error creating screening: " + e.getMessage());
-//        }
-//    }
-
-
-//    @PostMapping("/with-seats")
-//    public ResponseEntity<?> createScreeningWithSeats(@RequestBody Map<String, Object> payload, @RequestParam int numberOfSeats) {
-//        try {
-//            Long movieId = Long.valueOf(payload.get("movieId").toString());
-//            LocalDateTime screeningTime = LocalDateTime.parse(payload.get("screeningTime").toString());
-//
-//            Movie movie = movieRepository.findById(movieId)
-//                    .orElseThrow(() -> new RuntimeException("Movie not found"));
-//
-//            Screening screening = new Screening();
-//            screening.setMovie(movie);
-//            screening.setScreeningTime(screeningTime);
-//
-//            Screening createdScreening = screeningService.createScreeningWithSeats(screening, numberOfSeats);
-//            return ResponseEntity.status(HttpStatus.CREATED).body(createdScreening);
-//        } catch (Exception e) {
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-//                    .body("Error creating screening with seats: " + e.getMessage());
-//        }
-//    }
 
 
     @GetMapping("/{id}/available-seats")

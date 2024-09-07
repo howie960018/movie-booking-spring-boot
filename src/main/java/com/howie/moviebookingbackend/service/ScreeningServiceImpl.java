@@ -71,11 +71,13 @@ public class ScreeningServiceImpl implements ScreeningService {
 
     @Override
     @Transactional
-    public Screening createScreeningWithSeats(Screening screening, int numberOfSeats) {
-        Movie movie = movieRepository.findById(screening.getMovie().getId())
+    public Screening createScreeningWithSeats(Long movieId, LocalDateTime screeningTime, int numberOfSeats) {
+        Movie movie = movieRepository.findById(movieId)
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
+        Screening screening = new Screening();
         screening.setMovie(movie);
+        screening.setScreeningTime(screeningTime);
         screening.setAvailableSeats(numberOfSeats);
 
         Screening savedScreening = screeningRepository.save(screening);
@@ -85,11 +87,11 @@ public class ScreeningServiceImpl implements ScreeningService {
         char rowLetter = 'A';
 
         for (int i = 0; i < numberOfSeats; i++) {
-            int seatInRow = (i % seatsPerRow) + 1; // 從 1 開始
+            int seatInRow = (i % seatsPerRow) + 1;
             if (seatInRow == 1 && i > 0) {
                 rowLetter++;
             }
-            String seatNumber = rowLetter + String.format("%02d", seatInRow); // 使用兩位數字
+            String seatNumber = rowLetter + String.format("%02d", seatInRow);
 
             Seat seat = new Seat();
             seat.setSeatNumber(seatNumber);
@@ -100,11 +102,9 @@ public class ScreeningServiceImpl implements ScreeningService {
 
         seatRepository.saveAll(seats);
 
-        // 重新從資料庫獲取 Screening，確保 seats 被正確加載
         return screeningRepository.findById(savedScreening.getId())
                 .orElseThrow(() -> new RuntimeException("Failed to retrieve saved screening"));
     }
-
 
     @Override
     @Transactional(readOnly = true)

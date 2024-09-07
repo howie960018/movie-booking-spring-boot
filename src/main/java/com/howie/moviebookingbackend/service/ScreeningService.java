@@ -14,6 +14,6 @@ public interface ScreeningService {
     Screening saveScreening(Screening screening);
     void deleteScreening(Long id);
 
-    Screening createScreeningWithSeats(Screening screening, int numberOfSeats);
+    Screening createScreeningWithSeats(Long movieId, LocalDateTime screeningTime, int numberOfSeats);
     List<Seat> getAvailableSeats(Long screeningId);
 }
