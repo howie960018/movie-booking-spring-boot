@@ -4,25 +4,29 @@ import com.howie.moviebookingbackend.entity.Booking;
 import com.howie.moviebookingbackend.service.BookingService;
 import com.howie.moviebookingbackend.dto.BookingRequestDTO;
 import com.howie.moviebookingbackend.dto.BookingResponseDTO;
+import com.howie.moviebookingbackend.dto.BookingListItemDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import com.howie.moviebookingbackend.dto.ErrorResponse;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.howie.moviebookingbackend.entity.Seat;
+import com.howie.moviebookingbackend.repository.UserRepository;
+import org.springframework.security.core.Authentication;
 
 @RestController
 @RequestMapping("/api/bookings")
 public class BookingController {
 
     private final BookingService bookingService;
+    private final UserRepository userRepository;
 
     @Autowired
-    public BookingController(BookingService bookingService) {
+    public BookingController(BookingService bookingService, UserRepository userRepository) {
         this.bookingService = bookingService;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/create")
@@ -44,21 +48,20 @@ public class BookingController {
         return seatNumbers.stream().allMatch(seatNumber -> seatNumber.matches("[A-Z]\\d{2}"));
     }
     @GetMapping
-    public ResponseEntity<List<Booking>> getAllBookings() {
+    public ResponseEntity<List<BookingListItemDTO>> getAllBookings() {
         List<Booking> bookings = bookingService.getAllBookings();
-        return ResponseEntity.ok(bookings);
+        return ResponseEntity.ok(toListItemDTOs(bookings));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Booking> getBookingById(@PathVariable Long id) {
+    public ResponseEntity<BookingListItemDTO> getBookingById(@PathVariable Long id) {
         Booking booking = bookingService.getBookingById(id);
         if (booking != null) {
-            return ResponseEntity.ok(booking);
+            return ResponseEntity.ok(toListItemDTO(booking));
         } else {
             return ResponseEntity.notFound().build();
         }
     }
-
 
 //    @PostMapping
 //    public ResponseEntity<?> createBooking(@RequestBody BookingRequestDTO bookingRequest) {
@@ -82,14 +85,41 @@ public class BookingController {
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Booking>> getBookingsByUserId(@PathVariable Long userId) {
+    public ResponseEntity<List<BookingListItemDTO>> getBookingsByUserId(@PathVariable Long userId) {
         List<Booking> bookings = bookingService.getBookingsByUserId(userId);
-        return ResponseEntity.ok(bookings);
+        return ResponseEntity.ok(toListItemDTOs(bookings));
     }
 
     @GetMapping("/screening/{screeningId}")
-    public ResponseEntity<List<Booking>> getBookingsByScreeningId(@PathVariable Long screeningId) {
+    public ResponseEntity<List<BookingListItemDTO>> getBookingsByScreeningId(@PathVariable Long screeningId) {
         List<Booking> bookings = bookingService.getBookingsByScreeningId(screeningId);
-        return ResponseEntity.ok(bookings);
+        return ResponseEntity.ok(toListItemDTOs(bookings));
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<List<BookingListItemDTO>> getMyBookings(Authentication authentication) {
+        String email = authentication.getName();
+        Long userId = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"))
+                .getId();
+        List<Booking> bookings = bookingService.getBookingsByUserId(userId);
+        return ResponseEntity.ok(toListItemDTOs(bookings));
+    }
+
+    private BookingListItemDTO toListItemDTO(Booking booking) {
+        BookingListItemDTO dto = new BookingListItemDTO();
+        dto.setBookingId(booking.getId());
+        dto.setMovieTitle(booking.getScreening().getMovie().getTitle());
+        dto.setScreeningTime(booking.getScreening().getScreeningTime());
+        dto.setSeatNumbers(booking.getSeats().stream().map(Seat::getSeatNumber).toList());
+        dto.setBookingTime(booking.getBookingTime());
+        dto.setStatus(booking.getStatus().name());
+        dto.setUserId(booking.getUser().getId());
+        dto.setUserEmail(booking.getUser().getEmail());
+        return dto;
+    }
+
+    private List<BookingListItemDTO> toListItemDTOs(List<Booking> list) {
+        return list.stream().map(this::toListItemDTO).toList();
     }
 }

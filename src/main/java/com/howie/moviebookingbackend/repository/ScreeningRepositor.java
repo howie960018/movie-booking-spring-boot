@@ -11,4 +11,5 @@ import java.util.List;
 public interface ScreeningRepositor extends JpaRepository<Screening, Long> {
     List<Screening> findByMovieId(Long movieId);
     List<Screening> findByScreeningTimeBetween(LocalDateTime start, LocalDateTime end);
+    boolean existsByMovieIdAndScreeningTime(Long movieId, LocalDateTime screeningTime);
 }

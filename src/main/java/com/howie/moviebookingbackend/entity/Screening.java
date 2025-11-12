@@ -1,5 +1,6 @@
 package com.howie.moviebookingbackend.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
@@ -27,11 +28,12 @@ public class Screening {
     private LocalDateTime screeningTime;
 
     @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    @JsonManagedReference
+    @JsonManagedReference // 與 Seat.screening 搭配
     private List<Seat> seats = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // 避免遞迴：Screening -> Booking -> Screening
     private List<Booking> bookings;
 
 

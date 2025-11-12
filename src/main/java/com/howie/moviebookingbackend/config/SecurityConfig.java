@@ -33,9 +33,16 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/", "/index.html", "/css/**", "/js/**", "/favicon.ico").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/users/register").permitAll()
+                        // Public GET endpoints
+                        .requestMatchers(org.springframework.http.HttpMethod.GET, "/api/movies/**", "/api/screenings/**").permitAll()
+                        // Admin-only mutations
+                        .requestMatchers(org.springframework.http.HttpMethod.POST, "/api/movies/**", "/api/screenings/**").hasRole("ADMIN")
+                        .requestMatchers(org.springframework.http.HttpMethod.DELETE, "/api/movies/**", "/api/screenings/**").hasRole("ADMIN")
                         .requestMatchers("/api/users/admin/**").hasRole("ADMIN")
+                        // Other endpoints need auth
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

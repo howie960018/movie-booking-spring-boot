@@ -1,33 +1,35 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Maven build output
+/target/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-.sts4-cache
-
-### IntelliJ IDEA ###
-.idea
-*.iws
+# IDE settings
+.idea/
 *.iml
-*.ipr
+.classpath
+.project
+.settings/
 
-### NetBeans ###
-/nbproject/private/
-/nbbuild/
-/dist/
-/nbdist/
-/.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
+# OS files
+.DS_Store
+Thumbs.db
 
-### VS Code ###
+# Logs
+*.log
+
+# Dependency logs/cache
+.mvn/
+
+# Generated sources
+/generated-sources/
+
+# JWT / temp secrets (adjust as needed)
+*.secret
+
+# Node modules (if ever added for frontend build tooling)
+node_modules/
+
+# VSCode settings
 .vscode/
+
+# Ignore local environment overrides
+application-local.properties
+

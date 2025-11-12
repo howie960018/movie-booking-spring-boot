@@ -20,10 +20,11 @@ public class Seat {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "screening_id", nullable = false)
-    @JsonBackReference
+    @JsonBackReference // 與 Screening.seats 搭配
     private Screening screening;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "booking_id", nullable = true)
+    @JoinColumn(name = "booking_id")
+    @JsonBackReference(value = "booking-seats")
     private Booking booking;
 }
